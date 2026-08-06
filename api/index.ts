@@ -3,9 +3,6 @@ import { HTTPFacilitatorClient, x402ResourceServer } from "@x402/core/server";
 import { registerExactEvmScheme } from "@x402/evm/exact/server";
 import { paymentMiddleware } from "@x402/hono";
 import { Hono } from "hono";
-import { handle } from "hono/vercel";
-
-export const config = { runtime: "edge" };
 
 const PAY_TO = "0x465A003Ad9B708e0EFe291656BDF8a2b52cf0683";
 const BASE_MAINNET = "eip155:8453";
@@ -155,4 +152,8 @@ function hasBazaarExtension(value: unknown): boolean {
 function readField(value: unknown, key: string): unknown { return isRecord(value) ? value[key] : undefined; }
 function isRecord(value: unknown): value is Record<string, unknown> { return typeof value === "object" && value !== null && !Array.isArray(value); }
 
-export default handle(app);
+export default {
+  fetch(request: Request) {
+    return app.fetch(request);
+  },
+};
