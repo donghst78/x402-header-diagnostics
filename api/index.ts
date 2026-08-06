@@ -22,7 +22,9 @@ type DiagnosticRequest = {
 };
 
 const app = new Hono();
-const resourceServer = new x402ResourceServer(new HTTPFacilitatorClient(facilitator));
+// @coinbase/x402 currently bundles its own @x402/core type declarations.
+// The runtime facilitator contract is compatible; this cast avoids duplicate-package type identity conflicts.
+const resourceServer = new x402ResourceServer(new HTTPFacilitatorClient(facilitator as any));
 registerExactEvmScheme(resourceServer);
 
 app.use(
