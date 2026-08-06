@@ -1,0 +1,19 @@
+{
+  "name": "x402-header-diagnostics",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": { "build": "tsc --noEmit" },
+  "engines": { "node": ">=22" },
+  "dependencies": {
+    "@coinbase/x402": "2.1.0",
+    "@x402/core": "2.19.0",
+    "@x402/evm": "2.19.0",
+    "@x402/hono": "2.19.0",
+    "hono": "4.12.32"
+  },
+  "devDependencies": {
+    "@types/node": "24.1.0",
+    "typescript": "5.9.2"
+  }
+}
