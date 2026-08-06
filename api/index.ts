@@ -1,6 +1,7 @@
 import { facilitator } from "@coinbase/x402";
 import { HTTPFacilitatorClient, x402ResourceServer } from "@x402/core/server";
 import { registerExactEvmScheme } from "@x402/evm/exact/server";
+import { bazaarResourceServerExtension, declareDiscoveryExtension } from "@x402/extensions/bazaar";
 import { paymentMiddleware } from "@x402/hono";
 import { Hono } from "hono";
 
@@ -25,6 +26,7 @@ const app = new Hono();
 // The runtime facilitator contract is compatible; this cast avoids duplicate-package type identity conflicts.
 const resourceServer = new x402ResourceServer(new HTTPFacilitatorClient(facilitator as any));
 registerExactEvmScheme(resourceServer);
+resourceServer.registerExtension(bazaarResourceServerExtension);
 
 app.use(
   paymentMiddleware(
@@ -33,6 +35,46 @@ app.use(
         accepts: [{ scheme: "exact", price: "$0.10", network: BASE_MAINNET, payTo: PAY_TO }],
         description: "Validate an x402 v2 PAYMENT-REQUIRED challenge or header and return actionable integration diagnostics.",
         mimeType: "application/json",
+        extensions: {
+          ...declareDiscoveryExtension({
+            input: {
+              challenge: {
+                x402Version: 2,
+                accepts: [],
+              },
+            },
+            inputSchema: {
+              properties: {
+                paymentRequired: {
+                  type: "string",
+                  description: "Base64-encoded PAYMENT-REQUIRED header value.",
+                },
+                paymentSignature: {
+                  type: "string",
+                  description: "Base64-encoded PAYMENT-SIGNATURE header value.",
+                },
+                challenge: {
+                  type: "object",
+                  description: "Decoded x402 payment challenge object.",
+                },
+              },
+              anyOf: [
+                { required: ["paymentRequired"] },
+                { required: ["paymentSignature"] },
+                { required: ["challenge"] },
+              ],
+            },
+            bodyType: "json",
+            output: {
+              example: {
+                score: 100,
+                compatible: true,
+                summary: { errors: 0, warnings: 0, informational: 2 },
+                findings: [],
+              },
+            },
+          }),
+        },
       },
     },
     resourceServer,
