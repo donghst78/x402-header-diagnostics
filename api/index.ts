@@ -5,6 +5,8 @@ import { paymentMiddleware } from "@x402/hono";
 import { Hono } from "hono";
 import { handle } from "hono/vercel";
 
+export const config = { runtime: "edge" };
+
 const PAY_TO = "0x465A003Ad9B708e0EFe291656BDF8a2b52cf0683";
 const BASE_MAINNET = "eip155:8453";
 const BASE_USDC = "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913";
